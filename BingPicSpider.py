@@ -16,6 +16,14 @@ class BingPicSpider():
 		self.integratedInfo = ()
 		self.raw_api = self.apply_api()
 
+	def isAbsUrl(self,url):
+		import re
+		#没有找到协议部分就是返回假，代表不是绝对地址
+		if re.match('^(http)s?://',url) == None:
+			return False
+		else:
+			return True
+
 	def apply_api(self):
 		json_str = rr.get(self.bingTodayPicApi).text
 		self.raw_api = json.loads(json_str).get('images')[0]
@@ -24,6 +32,9 @@ class BingPicSpider():
 	def extractIntegratedInfo(self):
 		title = self.raw_api.get('copyright')
 		picurl = self.raw_api.get('url')
+		if not self.isAbsUrl(picurl):
+			picurl = "http://www.bing.com/" + picurl
+
 		picbinary = rr.get(picurl).content
 		date = self.raw_api.get('enddate')
 
@@ -53,7 +64,9 @@ def addUninsertedPicToDB():
 		raise Exception('All inserted error!')
 
 	for idx in uninsertedIndexs:
-		return addPicInfoToDB(db,idx)
+		addPicInfoToDB(db,idx)
+
+
 
 if __name__=="__main__":
 	#b = BingPicSpider(0)

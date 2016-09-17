@@ -78,11 +78,14 @@ class BingPicDB(DB):
     
     def getN(self,n):
         for pic in self.order_by_date().limit(n).all():
-            yield [pic.title,pic.date,pic.picbinary]
+            yield [pic.title,pic.date,pic.picurl]
             
     def getAll(self):
         for pic in self.order_by_date().all():
-            yield [pic.title,pic.date,pic.picbinary]
+            yield [pic.title,pic.date,pic.picurl]
+
+    def getPicBinary(self,pk_picurl):
+        return self.q.get(pk_picurl).picbinary
     
     def getLatest(self):
         return self.order_by_date().limit(1).one()
@@ -99,4 +102,4 @@ class BingPicDB(DB):
 
 if __name__ == '__main__':
     db = DB()
-    db.init_db()
+    # db.init_db()

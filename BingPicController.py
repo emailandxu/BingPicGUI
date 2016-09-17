@@ -20,6 +20,8 @@ class myui(UI.Ui_Form):
         self.current_PreviewRowIndex = 0
         self.picsList = self.refreshPicsListAndTable()
 
+        self.previewPicBytes = None
+
         self.setPreviwByRowIndex(0)
 
     def initDB(self):
@@ -93,7 +95,8 @@ class myui(UI.Ui_Form):
         """
         根据图片信息表的行号,更新图片标签控件的图片
         """
-        pic_bytes = self.picsList[index][-1]
+        pic_bytes = self.bing_db.getPicBinary(self.picsList[index][-1])
+        self.previewPicBytes = pic_bytes
         self.__setImagePixmapToIamgeLabel(pic_bytes)
 
     def on_itemClick(self,item):
@@ -113,12 +116,13 @@ class myui(UI.Ui_Form):
         """
         设置壁纸
         """
-        Process(target=WallpaperSetting().setWallpaper_bytes,args=(self.picsList[self.current_PreviewRowIndex][-1],)).start()
+        Process(target=WallpaperSetting().setWallpaper_bytes,args=(self.previewPicBytes,)).start()
 
     def on_updatebtnClick(self):
         """
         更新数据库中的数据,和UI中的表格,并把预览行号设成第0行
         """
+        QtGui.QMessageBox.warning(self.form,"warning", "Got to take a few time to update pictures!")
         try:
             addUninsertedPicToDB()
         except Exception as e:
@@ -129,11 +133,6 @@ class myui(UI.Ui_Form):
             self.setPreviwByRowIndex(0)
 
 if __name__ == '__main__':
-    try:
-        addTodayPicToDB()
-    except Exception as e:
-        print(e)  
-        
     ui = myui()
     ui.form.show()
     sys.exit(app.exec_())
