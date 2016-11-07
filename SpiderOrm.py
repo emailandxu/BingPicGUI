@@ -10,16 +10,18 @@ import sys
 import platform
 from path import Path
 
+DBNAME = "bingpic"
+
 if not 'Windows' in platform.platform():
-    __filepath__ = '/root/spider'
+    __filepath__ = '/root/%s'%DBNAME
 else:
     __filepath__ = os.path.split(sys.argv[0])[0]
     print(__filepath__)
 
 os.chdir(__filepath__)
 
-DB_CONNECT_STRING = 'sqlite:///spider.db'
-DB_PATH = './spider.db'
+DB_CONNECT_STRING = 'sqlite:///%s.db'%DBNAME
+DB_PATH = './%s.db'%DBNAME
 BASEMODEL = declarative_base()
 
 class BingPic(BASEMODEL):
@@ -72,7 +74,14 @@ class BingPicDB(DB):
     def initquery(self):
         q = self.session.query(BingPic)
         return q
-    
+        def isEmpty(self):
+        try:
+            self.getLatest()        
+        except NoResultFound as e:
+            return True
+        else:
+            return False   
+        
     def order_by_date(self):
         return self.q.order_by(BingPic.date.desc())
     
@@ -101,5 +110,4 @@ class BingPicDB(DB):
         
 
 if __name__ == '__main__':
-    db = DB()
-    # db.init_db()
+    db = BingPicDB()
