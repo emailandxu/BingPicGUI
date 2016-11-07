@@ -3,6 +3,7 @@ from sqlalchemy import Column
 from sqlalchemy.types import TEXT,BLOB
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import NoResultFound
 from datetime import datetime
 import datetime
 import os
