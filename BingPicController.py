@@ -1,11 +1,10 @@
 # -*- coding:utf-8 -*-
+import sys
 import BingPicView as UI
 from PyQt4 import QtCore, QtGui
 from SpiderOrm import BingPic,BingPicDB
 from Wallpaper import WallpaperSetting
 from BingPicSpider import addUninsertedPicToDB,addTodayPicToDB
-import sys
-from threading import Thread as Process
 
 app = QtGui.QApplication(sys.argv) 
 
@@ -95,6 +94,8 @@ class myui(UI.Ui_Form):
         """
         根据图片信息表的行号,更新图片标签控件的图片
         """
+        if self.bing_db.isEmpty():
+        	return
         pic_bytes = self.bing_db.getPicBinary(self.picsList[index][-1])
         self.previewPicBytes = pic_bytes
         self.__setImagePixmapToIamgeLabel(pic_bytes)
@@ -116,7 +117,7 @@ class myui(UI.Ui_Form):
         """
         设置壁纸
         """
-        Process(target=WallpaperSetting().setWallpaper_bytes,args=(self.previewPicBytes,)).start()
+        target=WallpaperSetting().setWallpaper_bytes(self.previewPicBytes,)
 
     def on_updatebtnClick(self):
         """
