@@ -66,7 +66,7 @@ class WallpaperSetting():
 
     def setWallpaper(self):
         """
-        对外部开放的方法,直接使用即可设置壁纸
+        对用户开放的方法,直接使用即可设置壁纸
         """
         picname,picpath = self.__downloadIntoSpecFolder(self.API)
         bmppath = self.__pic2BmpIntoTempFile(picpath, newExt='.bmp')
@@ -77,7 +77,7 @@ class WallpaperSetting():
 
     def setWallpaper_bytes(self,picbytes):
         """
-        对外部开放的方法,通过图像的二进制来设置壁纸
+        对第三方用例开放的方法,通过图像的二进制来设置壁纸
         """
         from io import BytesIO
         pic_fd = BytesIO()
@@ -87,11 +87,4 @@ class WallpaperSetting():
         os.remove(bmppath)
 
 if __name__ == "__main__":
-
-    bwps = WallpaperSetting(specFolder='C:\\Wallpaper')
-    bwps.setWallpaper()
-    
-
-
-
-
+    WallpaperSetting().setWallpaper()
