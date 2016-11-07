@@ -74,7 +74,8 @@ class BingPicDB(DB):
     def initquery(self):
         q = self.session.query(BingPic)
         return q
-        def isEmpty(self):
+    
+    def isEmpty(self):
         try:
             self.getLatest()        
         except NoResultFound as e:
