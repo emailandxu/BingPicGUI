@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import sys
+import _thread as thread
 import BingPicView as UI
 from PyQt4 import QtCore, QtGui
 from SpiderOrm import BingPic,BingPicDB
@@ -117,7 +118,8 @@ class myui(UI.Ui_Form):
         """
         设置壁纸
         """
-        target=WallpaperSetting().setWallpaper_bytes(self.previewPicBytes,)
+        thread.start_new_thread(WallpaperSetting().setWallpaper_bytes,
+        (self.previewPicBytes,))
 
     def on_updatebtnClick(self):
         """
@@ -125,7 +127,7 @@ class myui(UI.Ui_Form):
         """
         QtGui.QMessageBox.warning(self.form,"warning", "Got to take a few time to update pictures!")
         try:
-            addUninsertedPicToDB()
+            thread.start_new_thread(addUninsertedPicToDB,tuple())
         except Exception as e:
             msg = QtGui.QMessageBox.warning(self.form,"warning", "Noting to update!")
             print(e)
