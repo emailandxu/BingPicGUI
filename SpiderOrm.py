@@ -110,6 +110,17 @@ class BingPicDB(DB):
                 yield latest_18_date_in_real.index(day)
 
         
+def pullOffAllPicIntoExplorer(dst_path):
+    from PIL import Image
+    from io import BytesIO
+
+    for pic in db.order_by_date().all():
+        pic_f = BytesIO(pic.picbinary)
+        im = Image.open(pic_f)
+        
+        with open('%s%s.jpg'%(dst_path, pic.title.split('(')[0]),'wb') as f:
+            im.save(f,'jpeg')
 
 if __name__ == '__main__':
     db = BingPicDB()
+    pullOffAllPicIntoExplorer("D:/")
