@@ -58,8 +58,12 @@ class DB():
         return session
 
     def add(self,orm_obj):
-        self.session.add(orm_obj)
-        self.session.commit()
+        try:
+            self.session.add(orm_obj)
+            self.session.commit()
+        except Exception as e:
+            self.__init__()
+            raise Exception("some error during add object to db")
 
     def init_db(self):
         BASEMODEL.metadata.create_all(self.engine)
