@@ -2,18 +2,23 @@
 import sys
 import _thread as thread
 import BingPicView as UI
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtWidgets import QApplication,QWidget,QTableWidgetItem,QMessageBox
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import pyqtSignal
 from SpiderOrm import BingPic,BingPicDB
 from Wallpaper import WallpaperSetting
 from BingPicSpider import addUninsertedPicToDB,addTodayPicToDB
 
-app = QtGui.QApplication(sys.argv) 
+app = QApplication(sys.argv)
 
-class myui(UI.Ui_Form):
+class myui(UI.Ui_Form,QtCore.QObject):
+    inserted = pyqtSignal()
     def __init__(self):
+        super().__init__()
         self.bing_db = self.initDB()
 
-        super(myui,self).__init__()
+
         self.initUI()
         self.initSlot()
 
@@ -35,7 +40,7 @@ class myui(UI.Ui_Form):
         """
         初始化ui控件
         """
-        self.form = QtGui.QWidget()
+        self.form = QWidget()
         self.setupUi(self.form)
 
     def refreshPicsListAndTable(self):
@@ -55,6 +60,7 @@ class myui(UI.Ui_Form):
         self.apply_btn.clicked.connect(self.on_applybtnClick)
         self.update_btn.clicked.connect(self.on_updatebtnClick)
         self.confirm_btn.clicked.connect(self.on_confirmClick)
+        self.inserted.connect(self.onInserted)
 
 
     def __setCurrentPreviewRowIndex(self,rowindex):
@@ -68,7 +74,7 @@ class myui(UI.Ui_Form):
         """
         设置预览图片,强行定义其大小为768,432
         """
-        pixmap = QtGui.QPixmap()
+        pixmap = QPixmap()
         if bytesblag == True:
             pixmap.loadFromData(img)
         else:
@@ -87,7 +93,7 @@ class myui(UI.Ui_Form):
             for columnIndex,column in enumerate(row):
                 if columnIndex > self.images_table.columnCount()-1:
                     break
-                newItem = QtGui.QTableWidgetItem(column)  
+                newItem = QTableWidgetItem(column)
                 self.images_table.setItem(rowIndex, columnIndex, newItem)
                 self.images_table.horizontalHeader().resizeSection(1,72)
 
@@ -121,15 +127,24 @@ class myui(UI.Ui_Form):
         thread.start_new_thread(WallpaperSetting().setWallpaper_bytes,
         (self.previewPicBytes,))
 
+    def onInserted(self):
+        self.refreshPicsListAndTable()
+        self.setPreviwByRowIndex(0)
+
+    def insert(self):
+        addUninsertedPicToDB()
+        self.inserted.emit()
+
     def on_updatebtnClick(self):
         """
         更新数据库中的数据,和UI中的表格,并把预览行号设成第0行
         """
-        QtGui.QMessageBox.warning(self.form,"warning", "Got to take a few time to update pictures!")
+
+        QMessageBox.warning(self.form,"warning", "Got to take a few time to update pictures!")
         try:
-            thread.start_new_thread(addUninsertedPicToDB,tuple())
+            thread.start_new_thread(self.insert,tuple())
         except Exception as e:
-            msg = QtGui.QMessageBox.warning(self.form,"warning", "Noting to update!")
+            msg = QMessageBox.warning(self.form,"warning", "Noting to update!")
             print(e)
         else:
             self.refreshPicsListAndTable()
@@ -137,5 +152,9 @@ class myui(UI.Ui_Form):
 
 if __name__ == '__main__':
     ui = myui()
-    ui.form.show()
-    sys.exit(app.exec_())
+    try:
+        ui.form.show()
+        sys.exit(app.exec_())
+    except Exception as e:
+        print(e.__traceback__())
+

@@ -106,12 +106,12 @@ class BingPicDB(DB):
         return self.order_by_date().limit(1).one()
 
     def findUnInsertedDayIndex(self):
-        latest_18_rows = self.order_by_date().limit(18).all()
-        latest_18_date_in_rows = list(map(lambda row:row.date,latest_18_rows))
-        latest_18_date_in_real = [(datetime.date.today()-datetime.timedelta(i)).strftime('%Y%m%d') for i in range(18)]
-        for day in latest_18_date_in_real:
-            if day not in latest_18_date_in_rows:
-                yield latest_18_date_in_real.index(day)
+        latest_8_rows = self.order_by_date().limit(8).all()
+        latest_8_date_in_rows = list(map(lambda row:row.date,latest_8_rows))
+        latest_8_date_in_real = [(datetime.date.today()-datetime.timedelta(i)).strftime('%Y%m%d') for i in range(8)]
+        for day in latest_8_date_in_real:
+            if day not in latest_8_date_in_rows:
+                yield latest_8_date_in_real.index(day)
 
         
 def pullOffAllPicIntoExplorer(dst_path):
