@@ -1,5 +1,5 @@
 # BingPicGUI
 A BingPic wallpaper setter based on pyqt
 
-##Preview
+## Preview
 ![BingPicGUI Preview](http://www.xushuli.cc/images/github/preview/BingPic.jpg)
